@@ -1,0 +1,34 @@
+name: Test
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - "**.go"
+      - go.mod
+      - go.sum
+      - '.github/workflow/gotest.yml'
+  pull_request:
+    paths:
+      - "**.go"
+      - go.mod
+      - go.sum
+      - '.github/workflow/gotest.yml'
+
+jobs:
+  golangci:
+    name: test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Setup Go environment
+        uses: actions/setup-go@v2.1.3
+        with:
+          go-version: 1.18
+
+      - name: Tests
+        run: |
+          wget https://github.com/Lanly109/lan/releases/download/demo/demo.zip
+          unzip demo.zip
+          go test $(go list ./...)
