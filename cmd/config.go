@@ -16,9 +16,8 @@ const config string = `# use in all command except config
 CodePath = "304"
 
 # use in check command
+# "all" for all in csv
 Room = "304"
-
-# use in check command
 NameList = "namelist.csv"
 
 # use in time command
@@ -26,8 +25,8 @@ StartTime = "2021-11-17 08:30:00"
 EndTime = "2021-11-17 13:00:00"
 
 # use in clean command
-Problems = [ "expr", "live", "number", "power" ]
 SourcePath = "raw_304"
+Problems = [ "expr", "live", "number", "power" ]
 Extensions = [ ".cpp", ".c", ".pas" ]
 
 # use in moss command
@@ -38,8 +37,6 @@ ReviewComment = "expr"
 ReviewMaxLimit = 10
 ReviewExperimental = false
 ReviewNumberResult = 250
-
-
 
 # ===Don't Edit it if you do NOT know what you are doing=== #
 
