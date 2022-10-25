@@ -87,7 +87,10 @@ var timeCmd = &cobra.Command{
 		endTimeStr = viper.GetString("EndTime")
 		abnormalLog = viper.GetString("AbnormalLog")
 
-        loc, _ := time.LoadLocation("Asia/Shanghai")
+        loc, err := time.LoadLocation("Asia/Shanghai") 
+        if err != nil {
+            loc = time.FixedZone("CST", 8*3600)
+        }
 		startTime, _ = time.ParseInLocation(TimeTemplate, startTimeStr, loc)
 		endTime, _ = time.ParseInLocation(TimeTemplate, endTimeStr, loc)
 
