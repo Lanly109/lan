@@ -38,7 +38,7 @@ func addFile(path string, info fs.DirEntry, err error) error {
 		return nil
 	}
 
-    file, err := utils.ResolvePath(path[codePathLen+1:])
+	file, err := utils.ResolvePath(path[codePathLen+1:])
 	if err != nil {
 		log.Error(err)
 		return nil
@@ -146,7 +146,7 @@ var mossCmd = &cobra.Command{
 		experimental = viper.GetBool("ReviewExperimental")
 		numberResult = viper.GetInt64("ReviewNumberResult")
 
-        codePathLen = len(codePath)
+		codePathLen = len(codePath)
 		log.Info("CodePath: ", codePath)
 		log.Info("ReviewProblem: ", problem)
 		log.Info("ReviewUserID: ", userId)
