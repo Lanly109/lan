@@ -51,6 +51,7 @@ func (moss *Moss) uploadFile(session net.Conn, file string, index int) error {
 }
 
 func (moss *Moss) Review() string {
+	log.Debugf("Connecting %s...", server)
 	session, err := net.Dial("tcp", fmt.Sprintf("%v:%v", server, port))
 
 	if err != nil {
@@ -59,6 +60,7 @@ func (moss *Moss) Review() string {
 
 	defer session.Close()
 
+	log.Debug("Writing info...")
 	fmt.Fprintf(session, "moss %s\n", moss.UserId)
 	fmt.Fprintf(session, "directory 0\n")
 	fmt.Fprintf(session, "X %d\n", moss.Experimental)
@@ -66,6 +68,7 @@ func (moss *Moss) Review() string {
 	fmt.Fprintf(session, "show %d\n", moss.NumberResult)
 	fmt.Fprintf(session, "language %s\n", moss.Language)
 
+	log.Debug("Waiting response")
 	response, err := bufio.NewReader(session).ReadString('\n')
 
 	if err != nil || strings.TrimSpace(response) == "no" {
@@ -76,6 +79,7 @@ func (moss *Moss) Review() string {
 		}
 	}
 
+	log.Debug("Uploading Files...")
 	for index, file := range moss.Files {
 		err := moss.uploadFile(session, file, index+1)
 		if err != nil {
