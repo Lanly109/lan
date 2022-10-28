@@ -41,7 +41,7 @@ ReviewNumberResult = 250
 # ===Don't Edit it if you do NOT know what you are doing=== #
 
 AbnormalLog = "error.log"
-Md5File = "checker.hash"
+Md5File = "checker.hash.csv"
 Debug = false`
 
 // configCmd represents the config command
