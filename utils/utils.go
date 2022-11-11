@@ -12,8 +12,10 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+	"sort"
 	"strings"
 
+	mapset "github.com/deckarep/golang-set"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -23,11 +25,13 @@ func ResolvePath(path string) (Data, error) {
 	if len(s) != 3 {
 		return Data{}, fmt.Errorf("Invalid len[%d] path: %s", len(s), path)
 	}
+	fileSuffix := filepath.Ext(s[2])
+	fileNameOnly := strings.TrimSuffix(s[2], fileSuffix)
 	data := Data{
 		Path:      path,
 		Name:      s[0],
-		Problem:   strings.Split(s[2], ".")[0],
-		Extension: filepath.Ext(s[2]),
+		Problem:   fileNameOnly,
+		Extension: fileSuffix,
 		FileName:  s[2],
 	}
 
@@ -78,7 +82,7 @@ func Copy(src string, dest string) error {
 		return err
 	}
 
-	destFile, err := os.OpenFile(dest, os.O_CREATE|os.O_RDWR, 0664)
+	destFile, err := os.OpenFile(dest, os.O_CREATE|os.O_RDWR|os.O_TRUNC, 0664)
 
 	if err != nil {
 		log.Error(err)
@@ -140,4 +144,16 @@ func FileSize(fileName string) (int, error) {
 		return 0, err
 	}
 	return int(fileInfo.Size()), nil
+}
+
+func SetToOrderStringSlice(set mapset.Set) []string {
+    var data []string
+
+    for _, tmp := range set.ToSlice() {
+        data = append(data, fmt.Sprint(tmp))
+    }
+
+    sort.Strings(data)
+
+    return data
 }

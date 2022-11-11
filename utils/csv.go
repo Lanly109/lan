@@ -23,6 +23,7 @@ func ReadCsv(filepath string) [][]string {
 
 	//创建csv读取接口实例
 	readCsv := csv.NewReader(fp)
+    readCsv.FieldsPerRecord = -1
 
 	//读取所有内容
 	data, err := readCsv.ReadAll()
@@ -34,7 +35,7 @@ func ReadCsv(filepath string) [][]string {
 
 func WriteCsv(filepath string, datas [][]string) error {
 	//打开文件(只读模式)，创建io.read接口实例
-	fp, err := os.OpenFile(filepath, os.O_CREATE|os.O_RDWR, 0666)
+	fp, err := os.OpenFile(filepath, os.O_CREATE|os.O_RDWR|os.O_TRUNC, 0666)
 	if err != nil {
 		cobra.CheckErr(err)
 	}
