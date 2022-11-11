@@ -39,7 +39,7 @@ func Test_timeCommand(t *testing.T) {
 			err:            nil,
 			startTimeStr:   "2021-11-17 08:30:00",
 			endTimeStr:     "2021-11-17 13:00:00",
-			abnormalNumber: 2,
+			abnormalNumber: 1,
 			want:           "abnormal.log",
 		},
 		{
@@ -49,7 +49,7 @@ func Test_timeCommand(t *testing.T) {
 			err:            nil,
 			startTimeStr:   "2021-11-17 08:30:00",
 			endTimeStr:     "2021-11-17 13:00:00",
-			abnormalNumber: 2,
+			abnormalNumber: 1,
 			abnormalLog:    "qwq.log",
 			want:           "qwq.log",
 		},

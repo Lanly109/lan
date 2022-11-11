@@ -23,7 +23,7 @@ func ReadCsv(filepath string) [][]string {
 
 	//创建csv读取接口实例
 	readCsv := csv.NewReader(fp)
-    readCsv.FieldsPerRecord = -1
+	readCsv.FieldsPerRecord = -1
 
 	//读取所有内容
 	data, err := readCsv.ReadAll()

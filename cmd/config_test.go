@@ -24,14 +24,14 @@ func Test_configCommand(t *testing.T) {
 	}{
 		{
 			name: "case 1",
-			args: []string{"config"},
+			args: []string{"gen", "config"},
 			err:  nil,
 			want: "config.toml",
 		},
 		{
 
 			name:     "case 2",
-			args:     []string{"config", codePath},
+			args:     []string{"gen", "config"},
 			err:      nil,
 			fileName: "qwq.toml",
 			want:     "qwq.toml",

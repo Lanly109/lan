@@ -28,6 +28,7 @@ EndTime = "2021-11-17 13:00:00"
 SourcePath = "raw_304"
 Problems = [ "expr", "live", "number", "power" ]
 Extensions = [ ".cpp", ".c", ".pas" ]
+IgnoreExtensions = [ ".txt", ".in", ".out", ".ans", ".pdf", ".exe" ]
 
 # use in moss command
 ReviewProblem = "expr"
@@ -66,7 +67,7 @@ This instruction will create a file in sample toml format.`,
 }
 
 func init() {
-	rootCmd.AddCommand(configCmd)
+	genCmd.AddCommand(configCmd)
 
 	configCmd.Flags().StringVarP(&fileName, "name", "n", "config.toml", "The config name(default config.toml)")
 }

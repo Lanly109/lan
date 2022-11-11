@@ -19,13 +19,16 @@ import (
 )
 
 var (
-	srcPath       string
-	srcPathLen    int
-	problemList   []string
-	problemSet    mapset.Set
-	extensionList []string
-	extensionSet  mapset.Set
-	copyNum       int
+	srcPath             string
+	srcPathLen          int
+	problemList         []string
+	problemSet          mapset.Set
+	extensionList       []string
+	extensionSet        mapset.Set
+	ignoreExtensionList []string
+	ignoreExtensionSet  mapset.Set
+	copyNum             int
+	examId              map[string]map[string]bool
 )
 
 func copyFile(src string, info fs.DirEntry, err error) error {
@@ -44,13 +47,17 @@ func copyFile(src string, info fs.DirEntry, err error) error {
 	if info.IsDir() {
 		tmp := strings.Split(filePath, string(os.PathSeparator))
 		if len(tmp) > 2 {
-			log.Warnf("Invalid len of dir path: [%s]. Will skip it", src)
+			log.Warnf("Invalid len of dir path: [%s]. Skip it", src)
 			return fs.SkipDir
 		} else if len(tmp) == 2 { // GD-xxxx/problem
 			if !problemSet.Contains(tmp[1]) { // tmp[1] -> problem name
-				log.Warnf("Invalid problem[%s] of dir path: [%s]", tmp[1], src)
-				return nil
+				log.Warnf("Invalid problem[%s] of dir path: [%s]. Skip it", tmp[1], src)
+				return fs.SkipDir
+			} else {
+				examId[tmp[0]][tmp[1]] = false
 			}
+		} else {
+			examId[tmp[0]] = make(map[string]bool)
 		}
 
 		dest := filepath.Join(codePath, filePath)
@@ -67,24 +74,24 @@ func copyFile(src string, info fs.DirEntry, err error) error {
 		return nil
 	}
 
-	if filepath.Ext(filePath) == ".txt" {
+	if ignoreExtensionSet.Contains(filepath.Ext(filePath)) {
 		log.Debugf("Skip [%s]", src)
 		return nil
 	}
 
 	codeInfo, err := utils.ResolvePath(filePath)
 	if err != nil {
-		log.Error(err)
+		log.Warn(err)
 		return nil
 	}
 
 	if !problemSet.Contains(codeInfo.Problem) {
-		log.Debugf("Invalid problem[%s] of code file path: [%s]", codeInfo.Problem, src)
+		log.Warnf("Invalid problem[%s] of code file path: [%s]", codeInfo.Problem, src)
 		return nil
 	}
 
 	if !extensionSet.Contains(codeInfo.Extension) {
-		log.Debugf("Invalid extension[%s] of code file path: [%s]", codeInfo.Extension, src)
+		log.Warnf("Invalid extension[%s] of code file path: [%s]", codeInfo.Extension, src)
 		return nil
 	}
 
@@ -97,7 +104,11 @@ func copyFile(src string, info fs.DirEntry, err error) error {
 		return nil
 	}
 
-	log.Infof("Copy file [%s] -> [%s]", src, dest)
+	log.Debugf("Copy file [%s] -> [%s]", src, dest)
+	if examId[codeInfo.Name][codeInfo.Problem] == true {
+		log.Errorf("Multi valid files in [%s]-[%s]", codeInfo.Name, codeInfo.Problem)
+	}
+	examId[codeInfo.Name][codeInfo.Problem] = true
 	copyNum += 1
 	return nil
 }
@@ -139,9 +150,11 @@ var cleanCmd = &cobra.Command{
 	PreRun: func(cmd *cobra.Command, args []string) {
 		viper.BindPFlag("Problems", cmd.Flags().Lookup("problems"))
 		viper.BindPFlag("Extensions", cmd.Flags().Lookup("extensions"))
+		viper.BindPFlag("IgnoreExtensions", cmd.Flags().Lookup("ignoreexts"))
 
 		problemList = viper.GetStringSlice("Problems")
 		extensionList = viper.GetStringSlice("Extensions")
+		ignoreExtensionList = viper.GetStringSlice("IgnoreExtensions")
 
 		srcPath = filepath.Clean(srcPath)
 		srcPathLen = len(srcPath)
@@ -151,22 +164,40 @@ var cleanCmd = &cobra.Command{
 		log.Info("CodePath: ", codePath)
 		log.Info("Problems: ", problemList)
 		log.Info("Extentions: ", extensionList)
+		log.Info("IgnoreExtentions: ", ignoreExtensionList)
 
-		var tmpList1, tmpList2 []interface{}
+		var tmpList1, tmpList2, tmpList3 []interface{}
 		for _, data := range problemList {
 			tmpList1 = append(tmpList1, data)
 		}
 		for _, data := range extensionList {
 			tmpList2 = append(tmpList2, data)
 		}
+		for _, data := range ignoreExtensionList {
+			tmpList3 = append(tmpList3, data)
+		}
 
 		problemSet = mapset.NewSetFromSlice(tmpList1)
 		extensionSet = mapset.NewSetFromSlice(tmpList2)
+		ignoreExtensionSet = mapset.NewSetFromSlice(tmpList3)
 	},
 	Run: func(cmd *cobra.Command, args []string) {
 		copyNum = 0
+		examId = make(map[string]map[string]bool)
 
 		filepath.WalkDir(srcPath, copyFile)
+
+		for id, probs := range examId {
+			if len(probs) == 0 {
+				log.Errorf("No valid file found in [%s]", id)
+			} else {
+				for prob, ok := range probs {
+					if !ok {
+						log.Errorf("No valid file found in [%s]-[%s]", id, prob)
+					}
+				}
+			}
+		}
 
 		log.Infof("Copy %d files", copyNum)
 	},
@@ -177,4 +208,5 @@ func init() {
 
 	cleanCmd.Flags().StringSliceVarP(&problemList, "problems", "", []string{"problem1", "problem2"}, "competition problems")
 	cleanCmd.Flags().StringSliceVarP(&extensionList, "extensions", "", []string{".cpp", ".c", ".pas"}, "accepted code extensions")
+	cleanCmd.Flags().StringSliceVarP(&ignoreExtensionList, "ignoreexts", "", []string{".txt", ".in", ".out", ".ans", ".pdf", ".exe"}, "ignore file extensions")
 }

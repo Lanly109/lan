@@ -23,31 +23,36 @@ func Test_getContanstansFromCsv(t *testing.T) {
 	nameList = filepath.Join(testPath, "namelist.csv")
 
 	tests := []struct {
-		name string
-		want mapset.Set
-		room string
+		name       string
+		want       mapset.Set
+		wantAbsent mapset.Set
+		room       string
 	}{
 		{
-			name: "case 1",
-			want: mapset.NewSet("GD-00081", "GD-00111", "GD-00139", "GD-00192", "GD-00032", "GD-00077"),
-			room: "304",
+			name:       "case 1",
+			want:       mapset.NewSet("GD-00032", "GD-00077", "GD-00081", "GD-00111", "GD-00139", "GD-00192"),
+			wantAbsent: mapset.NewSet("GD-00111", "GD-00139"),
+			room:       "304",
 		},
 		{
-			name: "case 2",
-			want: mapset.NewSet("GD-00018", "GD-00062", "GD-00128", "GD-00153", "GD-00291"),
-			room: "402",
+			name:       "case 2",
+			want:       mapset.NewSet("GD-00018", "GD-00062", "GD-00128", "GD-00153", "GD-00291"),
+			wantAbsent: mapset.NewSet("GD-00062"),
+			room:       "402",
 		},
 		{
-			name: "case 3",
-			want: mapset.NewSet("GD-00081", "GD-00111", "GD-00139", "GD-00192", "GD-00032", "GD-00077", "GD-00018", "GD-00062", "GD-00128", "GD-00153", "GD-00291"),
-			room: "all",
+			name:       "case 3",
+			want:       mapset.NewSet("GD-00018", "GD-00032", "GD-00062", "GD-00077", "GD-00081", "GD-00111", "GD-00128", "GD-00139", "GD-00153", "GD-00192", "GD-00291"),
+			wantAbsent: mapset.NewSet("GD-00062", "GD-00111", "GD-00139"),
+			room:       "all",
 		},
 	}
 	for _, tt := range tests {
 		room = tt.room
 		t.Run(tt.name, func(t *testing.T) {
-			got := getContanstansFromCsv()
+			got, absent := getContanstansFromCsv()
 			is.Equal(got, tt.want)
+			is.Equal(absent, tt.wantAbsent)
 		})
 	}
 }
@@ -62,7 +67,7 @@ func Test_getContanstansFromCodePath(t *testing.T) {
 	}{
 		{
 			name: "case 1",
-			want: mapset.NewSet("GD-00032", "GD-00077", "GD-00081", "GD-00111", "GD-00139", "GD-00142", "GD-00192"),
+			want: mapset.NewSet("GD-00018", "GD-00032", "GD-00077", "GD-00081", "GD-00129", "GD-00139"),
 		},
 	}
 	for _, tt := range tests {
@@ -78,28 +83,37 @@ func Test_checkCommand(t *testing.T) {
 	codePath = filepath.Join(testPath, "clean_304")
 
 	tests := []struct {
-		name   string
-		args   []string
-		room   string
-		err    error
-		absent mapset.Set
-		extra  mapset.Set
+		name              string
+		args              []string
+		room              string
+		err               error
+		absent            mapset.Set
+		knownAbsent       mapset.Set
+		knownAbsentButNot mapset.Set
+		unknownAbsent     mapset.Set
+		extra             mapset.Set
 	}{
 		{
-			name:   "case 1",
-			args:   []string{"check", codePath},
-			room:   "304",
-			err:    nil,
-			absent: mapset.NewSet(),
-			extra:  mapset.NewSet("GD-00142"),
+			name:              "case 1",
+			args:              []string{"check", codePath},
+			room:              "304",
+			err:               nil,
+			absent:            mapset.NewSet("GD-00111", "GD-00192"),
+			knownAbsentButNot: mapset.NewSet("GD-00139"),
+			knownAbsent:       mapset.NewSet("GD-00111"),
+			unknownAbsent:     mapset.NewSet("GD-00192"),
+			extra:             mapset.NewSet("GD-00018", "GD-00129"),
 		},
 		{
-			name:   "case 2",
-			args:   []string{"check", codePath},
-			room:   "all",
-			err:    nil,
-			absent: mapset.NewSet("GD-00291", "GD-00018", "GD-00128", "GD-00153", "GD-00062"),
-			extra:  mapset.NewSet("GD-00142"),
+			name:              "case 2",
+			args:              []string{"check", codePath},
+			room:              "all",
+			err:               nil,
+			absent:            mapset.NewSet("GD-00062", "GD-00111", "GD-00128", "GD-00153", "GD-00192", "GD-00291"),
+			knownAbsentButNot: mapset.NewSet("GD-00139"),
+			knownAbsent:       mapset.NewSet("GD-00062", "GD-00111"),
+			unknownAbsent:     mapset.NewSet("GD-00128", "GD-00153", "GD-00192", "GD-00291"),
+			extra:             mapset.NewSet("GD-00129"),
 		},
 		{
 			name: "case 3",
@@ -118,6 +132,9 @@ func Test_checkCommand(t *testing.T) {
 
 			if got == nil {
 				is.Equal(absentContanstants, tt.absent)
+				is.Equal(knownAbsentButAcutualNot, tt.knownAbsentButNot)
+				is.Equal(knownAbsentContanstants, tt.knownAbsent)
+				is.Equal(unknownAbsentContanstants, tt.unknownAbsent)
 				is.Equal(extraContanstants, tt.extra)
 			}
 		})

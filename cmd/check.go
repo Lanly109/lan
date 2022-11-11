@@ -18,12 +18,15 @@ import (
 )
 
 var (
-	nameList           string
-	codePath           string
-	codePathLen        int
-	room               string
-	absentContanstants mapset.Set
-	extraContanstants  mapset.Set
+	nameList                  string
+	codePath                  string
+	codePathLen               int
+	room                      string
+	absentContanstants        mapset.Set
+	knownAbsentContanstants   mapset.Set
+	unknownAbsentContanstants mapset.Set
+	extraContanstants         mapset.Set
+	knownAbsentButAcutualNot  mapset.Set
 )
 
 // checkCmd represents the check command
@@ -58,33 +61,49 @@ var checkCmd = &cobra.Command{
 	},
 	Run: func(cmd *cobra.Command, args []string) {
 
-		expectContestants := getContanstansFromCsv()
+		expectContestants, knownAbsentContestants := getContanstansFromCsv()
 		realContestants := getContanstansFromCodePath()
 
-		log.Debug("Expected Contestant: ", expectContestants.String())
-		log.Debug("Real Contestant: ", realContestants.String())
+		log.Debug("Expected Contestant: ", utils.SetToOrderStringSlice(expectContestants))
+		log.Debug("Known Absent Contestant: ", utils.SetToOrderStringSlice(knownAbsentContestants))
+		log.Debug("Real Contestant: ", utils.SetToOrderStringSlice(realContestants))
 
 		absentContanstants = expectContestants.Difference(realContestants)
+		knownAbsentButAcutualNot = knownAbsentContestants.Difference(absentContanstants)
+		if knownAbsentButAcutualNot.Cardinality() != 0 {
+			log.Error("Known Absent But actual NOT absent: ", utils.SetToOrderStringSlice(knownAbsentButAcutualNot))
+		}
+
+		knownAbsentContanstants = absentContanstants.Intersect(knownAbsentContestants)
+		unknownAbsentContanstants = absentContanstants.Difference(knownAbsentContestants)
 		extraContanstants = realContestants.Difference(expectContestants)
 
-		log.Warn("Contestant without submissions: ", absentContanstants)
-		log.Warn("Contestant should not in this room: ", extraContanstants)
+		log.Warn("Absent Contestants: ", utils.SetToOrderStringSlice(absentContanstants))
+		log.Warn("Known Absent Contestants: ", utils.SetToOrderStringSlice(knownAbsentContanstants))
+		log.Warn("Unknown Absent Contestants: ", utils.SetToOrderStringSlice(unknownAbsentContanstants))
+		log.Warn("Contestants should not in this room: ", utils.SetToOrderStringSlice(extraContanstants))
+
+		log.Infof("Required attendance:\t%d people", expectContestants.Cardinality())
+		log.Infof("Actual attendance:\t%d people", realContestants.Cardinality()-extraContanstants.Cardinality())
 	},
 }
 
-func getContanstansFromCsv() mapset.Set {
+func getContanstansFromCsv() (mapset.Set, mapset.Set) {
 	datas := utils.ReadCsv(nameList)
 
 	log.Debug("NameList: ", datas)
 
-	var filteData []interface{}
+	var filteData, absentData []interface{}
 	for _, data := range datas {
 		if data[1] == room || room == "all" {
 			filteData = append(filteData, data[0])
+			if len(data) > 2 && data[2] == "0" {
+				absentData = append(absentData, data[0])
+			}
 		}
 	}
 
-	return mapset.NewSetFromSlice(filteData)
+	return mapset.NewSetFromSlice(filteData), mapset.NewSetFromSlice(absentData)
 }
 
 func getContanstansFromCodePath() mapset.Set {

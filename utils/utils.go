@@ -147,13 +147,13 @@ func FileSize(fileName string) (int, error) {
 }
 
 func SetToOrderStringSlice(set mapset.Set) []string {
-    var data []string
+	var data []string
 
-    for _, tmp := range set.ToSlice() {
-        data = append(data, fmt.Sprint(tmp))
-    }
+	for _, tmp := range set.ToSlice() {
+		data = append(data, fmt.Sprint(tmp))
+	}
 
-    sort.Strings(data)
+	sort.Strings(data)
 
-    return data
+	return data
 }
