@@ -19,12 +19,13 @@ import (
 )
 
 var (
-	startTimeStr string
-	endTimeStr   string
-	abnormalLog  string
-	startTime    time.Time
-	endTime      time.Time
-	abnormalList []Data
+	startTimeStr    string
+	endTimeStr      string
+	abnormalLog     string
+	sourceSizeLimit int64
+	startTime       time.Time
+	endTime         time.Time
+	abnormalList    []Data
 )
 
 func visit(path string, info fs.DirEntry, err error) error {
@@ -45,7 +46,7 @@ func visit(path string, info fs.DirEntry, err error) error {
 	} else {
 		log.WithField("path", path).Debug(fileInfo.ModTime().Format(TimeTemplate))
 
-		if fileInfo.ModTime().Before(startTime) || fileInfo.ModTime().After(endTime) {
+		if fileInfo.ModTime().Before(startTime) || fileInfo.ModTime().After(endTime) || fileInfo.Size() > sourceSizeLimit {
 			abnor, err := ResolvePath(path[codePathLen+1:])
 			if err != nil {
 				log.Error(err)
@@ -53,6 +54,7 @@ func visit(path string, info fs.DirEntry, err error) error {
 			}
 
 			abnor.ModifyTime = fileInfo.ModTime()
+			abnor.Size = fileInfo.Size()
 			log.Warn(abnor.String())
 			abnormalList = append(abnormalList, abnor)
 		}
@@ -60,11 +62,11 @@ func visit(path string, info fs.DirEntry, err error) error {
 	return nil
 }
 
-// timeCmd represents the time command
-var timeCmd = &cobra.Command{
-	Use:   "time <CodePath>",
-	Short: "Check modify time of code",
-	Long:  `Check whether the modify time of code is in the competition during.`,
+// validCmd represents the time command
+var validCmd = &cobra.Command{
+	Use:   "valid <CodePath>",
+	Short: "Check modify time and size of code",
+	Long:  `Check whether the modify of code is in the competition during and the size of code is in limit.`,
 	Args: func(cmd *cobra.Command, args []string) error {
 		if len(args) < 1 {
 			codePath = viper.GetString("CodePath")
@@ -82,10 +84,12 @@ var timeCmd = &cobra.Command{
 		viper.BindPFlag("StartTime", cmd.Flags().Lookup("starttime"))
 		viper.BindPFlag("EndTime", cmd.Flags().Lookup("endtime"))
 		viper.BindPFlag("AbnormalLog", cmd.Flags().Lookup("abnormallog"))
+		viper.BindPFlag("SourceSizeLimit", cmd.Flags().Lookup("sizelimit"))
 
 		startTimeStr = viper.GetString("StartTime")
 		endTimeStr = viper.GetString("EndTime")
 		abnormalLog = viper.GetString("AbnormalLog")
+		sourceSizeLimit = viper.GetInt64("SourceSizeLimit")
 
 		loc, err := time.LoadLocation("Asia/Shanghai")
 		if err != nil {
@@ -101,6 +105,7 @@ var timeCmd = &cobra.Command{
 		log.Info("StartTime: ", startTime.Format(TimeTemplate))
 		log.Info("EndTime: ", endTime.Format(TimeTemplate))
 		log.Info("AbnormalLog: ", abnormalLog)
+		log.Info("SourceSizeLimit: ", sourceSizeLimit)
 	},
 	Run: func(cmd *cobra.Command, args []string) {
 		abnormalList = []Data{}
@@ -120,9 +125,10 @@ var timeCmd = &cobra.Command{
 }
 
 func init() {
-	rootCmd.AddCommand(timeCmd)
+	rootCmd.AddCommand(validCmd)
 
-	timeCmd.Flags().StringVarP(&startTimeStr, "starttime", "s", "0000-00-00 00:00:00", "Start Time of competition")
-	timeCmd.Flags().StringVarP(&endTimeStr, "endtime", "e", "9999-12-31 23:59:59", "End Time of competition")
-	timeCmd.Flags().StringVarP(&abnormalLog, "abnormallog", "a", "abnormal.log", "List of exception modification times")
+	validCmd.Flags().StringVarP(&startTimeStr, "starttime", "s", "0000-00-00 00:00:00", "Start Time of competition")
+	validCmd.Flags().StringVarP(&endTimeStr, "endtime", "e", "9999-12-31 23:59:59", "End Time of competition")
+	validCmd.Flags().Int64Var(&sourceSizeLimit, "sizelimit", 1024 * 100, "Source Code size limit")
+	validCmd.Flags().StringVarP(&abnormalLog, "abnormallog", "a", "abnormal.log", "List of exception modification times")
 }

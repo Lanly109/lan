@@ -7,6 +7,29 @@
 
 因为是众多工具的集合，懒人福音，故取名为`lan`，意为`懒`。
 
+## 更新日志
+
+### 2023.2.26
+
+- `time`命令更名为`valid`命令，新增`SourceSizeLimit`参数，在检查时间戳的基础上追加代码文件大小检查
+- 更新`demo`
+
+### 2022.11.5
+
+- 新增`已知缺席考生`特性，优化`clean`命令的结果描述
+- 新增`gen`命令，原先`config`命令移至到`gen`的子命令下，同时新增`countdown`和`share`子命令，用于生成`倒计时html模板`和`打开共享文件夹源代码`文件
+- 修复了重复执行`md5`命令时，输出文件内容异常的情况
+- 更新`demo`
+
+### 2022.10.28
+
+- 修复了`moss`命令时相对路径解析错误的问题
+- 修改了`md5`命令默认保存文件名
+
+### 2022.10.15
+
+- v0.1版发布
+
 ## 流程
 
 1. 召集考点负责人开会，各考点确定学校和试室的缩写，方便后面汇总。
@@ -104,8 +127,8 @@ chmod +x lan
 ./lan check
 # 生成md5码文件，并下发
 ./lan md5
-# 检查文件修改时间
-./lan time
+# 检查文件修改时间和文件大小
+./lan valid
 # 查重
 ./lan moss
 ```
@@ -193,10 +216,10 @@ Md5File : md5文件名，非必要不更改
 
 该操作会将`CodePath`的所有文件生成一份`md5`表单，配合[checker](https://github.com/xfoxfu/checker)使用，
 
-### 修改时间检查
+### 修改时间和文件大小检查
 
 ```bash 
-./lan time
+./lan valid
 ``` 
 
 配置说明：
@@ -205,10 +228,11 @@ Md5File : md5文件名，非必要不更改
 CodePath : 待检查的文件夹路径
 StartTime : 比赛开始时间
 EndTime : 比赛结束时间
+SourceSizeLimit : 文件最大大小（单位:byte）
 AbnormalLog : 修改时间异常的学生清单
 ``` 
 
-该操作会将`CodePath`的所有修改时间不在比赛时间内的文件列一份清单，保存在`AbnormalLog`中。
+该操作会将`CodePath`的所有修改时间不在比赛时间内以及大小超出限制的文件列一份清单，保存在`AbnormalLog`中。
 
 ### 查重
 
@@ -241,7 +265,7 @@ ReviewNumberResult : 显示的结果数
 ./lan clean 304 raw_304 --problems=expr,live,number,power --extensions=.cpp,.c,.pas --ignoreexts=.txt,.in,.out,.ans,.pdf,.exe
 ./lan check 304 --room=304 --namelist=namelist.csv
 ./lan md5 304
-./lan time 304 --starttime="2021-11-20 08:30:00" --endtime="2021-11-17 13:00:00"
+./lan valid 304 --starttime="2021-11-20 08:30:00" --endtime="2021-11-17 13:00:00" --sizelimit=102400
 ./lan moss 304 --problem=expr --language=cc --maxlimit=10 --numberresult=250 --userid=xxxx
 ``` 
 

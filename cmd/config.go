@@ -20,9 +20,10 @@ CodePath = "304"
 Room = "304"
 NameList = "namelist.csv"
 
-# use in time command
+# use in valid command
 StartTime = "2021-11-17 08:30:00"
 EndTime = "2021-11-17 13:00:00"
+SourceSizeLimit = 102400 # byte
 
 # use in clean command
 SourcePath = "raw_304"

@@ -18,13 +18,14 @@ type Data struct {
 	Extension  string
 	FileName   string
 	Md5        string
+	Size       int64
 	ModifyTime time.Time
 }
 
 func (s *Data) String() string {
-	return fmt.Sprintf("[%s %s]: %s", s.Name, s.FileName, s.ModifyTime.Format(TimeTemplate))
+	return fmt.Sprintf("[%s %s]: %s %.2fkb", s.Name, s.FileName, s.ModifyTime.Format(TimeTemplate), float64(s.Size) / 1024)
 }
 
 func (s *Data) Output() string {
-	return fmt.Sprintf("%s的%s修改时间为%s;", s.Name, s.FileName, s.ModifyTime.Format(TimeTemplate))
+	return fmt.Sprintf("%s的%s修改时间为%s，大小为%.2fkb;", s.Name, s.FileName, s.ModifyTime.Format(TimeTemplate), float64(s.Size) / 1024)
 }

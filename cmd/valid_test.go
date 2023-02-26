@@ -13,7 +13,7 @@ import (
 	"github.com/matryer/is"
 )
 
-func Test_timeCommand(t *testing.T) {
+func Test_validCommand(t *testing.T) {
 	is := is.New(t)
 	codePath = filepath.Join(testPath, "clean_304")
 
@@ -29,27 +29,27 @@ func Test_timeCommand(t *testing.T) {
 	}{
 		{
 			name: "case 1",
-			args: []string{"time"},
+			args: []string{"valid"},
 			err:  errors.New("Requires args of Code Path"),
 		},
 		{
 
 			name:           "case 2",
-			args:           []string{"time", codePath},
+			args:           []string{"valid", codePath},
 			err:            nil,
 			startTimeStr:   "2021-11-17 08:30:00",
 			endTimeStr:     "2021-11-17 13:00:00",
-			abnormalNumber: 1,
+			abnormalNumber: 2,
 			want:           "abnormal.log",
 		},
 		{
 
 			name:           "case 3",
-			args:           []string{"time", codePath},
+			args:           []string{"valid", codePath},
 			err:            nil,
 			startTimeStr:   "2021-11-17 08:30:00",
 			endTimeStr:     "2021-11-17 13:00:00",
-			abnormalNumber: 1,
+			abnormalNumber: 2,
 			abnormalLog:    "qwq.log",
 			want:           "qwq.log",
 		},

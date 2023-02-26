@@ -38,7 +38,7 @@ func Test_md5Command(t *testing.T) {
 			args:     []string{"md5", codePath},
 			err:      nil,
 			wantFile: "checker.hash",
-			md5:      "3176a9c52bbba19dbc113b59067e9e82",
+			md5:      "c7d36d0efb61c31c8372c24ab8464af8",
 			want: `GD-00018,expr,06c81b60f732b5e676f5094c9574d6eb
 GD-00018,live,13a0063b0e624ca25f6aaec813ef9bb6
 GD-00018,number,c5b8cdc8deabd20422a3762c1ee855d2
@@ -53,7 +53,7 @@ GD-00129,expr,6a8e5c7a4c0eb6197d2de77a8f663d89
 GD-00129,live,abcbb58bf383db2954ca669288cbed0a
 GD-00129,number,ae2cd346028e80ea22de88d711e47ee7
 GD-00129,power,3828e142aaa229ab94a711d510cbe6a2
-GD-00139,expr,b5f9dc19c1e093d35c31ab0002cab3b5
+GD-00139,expr,4d28fd9af924b970ba4739fdc2175f96
 GD-00139,live,1c0a55027ce93cb3d4db976b740e50b8
 GD-00139,number,2e30638f33f913145e4e129eac238163
 GD-00139,power,6a733844e618c38f366f9a149a6c68a0
@@ -65,7 +65,7 @@ GD-00139,power,6a733844e618c38f366f9a149a6c68a0
 			err:      nil,
 			md5File:  "qwq.hash",
 			wantFile: "qwq.hash",
-			md5:      "3176a9c52bbba19dbc113b59067e9e82",
+			md5:      "c7d36d0efb61c31c8372c24ab8464af8",
 			want: `GD-00018,expr,06c81b60f732b5e676f5094c9574d6eb
 GD-00018,live,13a0063b0e624ca25f6aaec813ef9bb6
 GD-00018,number,c5b8cdc8deabd20422a3762c1ee855d2
@@ -80,7 +80,7 @@ GD-00129,expr,6a8e5c7a4c0eb6197d2de77a8f663d89
 GD-00129,live,abcbb58bf383db2954ca669288cbed0a
 GD-00129,number,ae2cd346028e80ea22de88d711e47ee7
 GD-00129,power,3828e142aaa229ab94a711d510cbe6a2
-GD-00139,expr,b5f9dc19c1e093d35c31ab0002cab3b5
+GD-00139,expr,4d28fd9af924b970ba4739fdc2175f96
 GD-00139,live,1c0a55027ce93cb3d4db976b740e50b8
 GD-00139,number,2e30638f33f913145e4e129eac238163
 GD-00139,power,6a733844e618c38f366f9a149a6c68a0
