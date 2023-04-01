@@ -78,8 +78,8 @@ var checkCmd = &cobra.Command{
 		unknownAbsentContanstants = absentContanstants.Difference(knownAbsentContestants)
 		extraContanstants = realContestants.Difference(expectContestants)
 
-		log.Warn("Absent Contestants: ", utils.SetToOrderStringSlice(absentContanstants))
-		log.Warn("Known Absent Contestants: ", utils.SetToOrderStringSlice(knownAbsentContanstants))
+		log.Info("Absent Contestants: ", utils.SetToOrderStringSlice(absentContanstants))
+		log.Info("Known Absent Contestants: ", utils.SetToOrderStringSlice(knownAbsentContanstants))
 		log.Warn("Unknown Absent Contestants: ", utils.SetToOrderStringSlice(unknownAbsentContanstants))
 		log.Warn("Contestants should not in this room: ", utils.SetToOrderStringSlice(extraContanstants))
 

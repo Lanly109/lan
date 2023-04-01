@@ -23,7 +23,7 @@ type Data struct {
 }
 
 func (s *Data) String() string {
-	return fmt.Sprintf("[%s %s]: %s %.2fkb", s.Name, s.FileName, s.ModifyTime.Format(TimeTemplate), float64(s.Size) / 1024)
+	return fmt.Sprintf("[%s %s]:\t%s %.2fkb", s.Name, s.FileName, s.ModifyTime.Format(TimeTemplate), float64(s.Size) / 1024)
 }
 
 func (s *Data) Output() string {

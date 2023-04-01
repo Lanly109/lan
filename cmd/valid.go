@@ -105,7 +105,7 @@ var validCmd = &cobra.Command{
 		log.Info("StartTime: ", startTime.Format(TimeTemplate))
 		log.Info("EndTime: ", endTime.Format(TimeTemplate))
 		log.Info("AbnormalLog: ", abnormalLog)
-		log.Info("SourceSizeLimit: ", sourceSizeLimit)
+		log.Info("SourceSizeLimit: ", sourceSizeLimit, " bytes")
 	},
 	Run: func(cmd *cobra.Command, args []string) {
 		abnormalList = []Data{}
