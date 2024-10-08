@@ -9,6 +9,11 @@
 
 ## 更新日志
 
+### 2024.10.8
+
+- 新增`auto`指令，一键执行整个流程，即`clean -> check -> valid -> md5`
+- 更新`倒计时html模版`
+
 ### 2023.2.26
 
 - `time`命令更名为`valid`命令，新增`SourceSizeLimit`参数，在检查时间戳的基础上追加代码文件大小检查
@@ -121,6 +126,10 @@ chmod +x lan
 # 生成配置文件，并修改
 ./lan gen config
 
+# 一键执行
+./lan auto
+# 或者依次执行以下步骤
+
 # 清理无关文件
 ./lan clean
 # 检查成员名单
@@ -129,6 +138,7 @@ chmod +x lan
 ./lan md5
 # 检查文件修改时间和文件大小
 ./lan valid
+
 # 查重
 ./lan moss
 ```
@@ -160,6 +170,14 @@ chmod +x lan
 ---
 
 后续指令默认读取`config.toml`配置文件，如需更改，可接`--config=<name>`参数自定义读取配置文件
+
+### 一键执行
+
+```bash 
+./lan auto
+``` 
+
+此命令将依次执行`clean -> check -> valid -> md5`指令，配置读取推荐为配置文件。
 
 ### 清理无关文件
 
